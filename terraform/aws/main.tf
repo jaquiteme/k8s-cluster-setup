@@ -33,20 +33,10 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
-# Create Public Subnet for K8s cluster nodes 
-resource "aws_subnet" "k8s_cluster_public" {
-  vpc_id     = module.vpc.vpc_id
-  cidr_block = "172.16.1.0/24"
-
-  tags = {
-    Name        = "k8s-subnet-public-1"
-  }
-}
-
-# Create Public Subnet for K8s cluster nodes 
+# Create Private Subnet for K8s cluster nodes 
 resource "aws_subnet" "k8s_cluster_private" {
   vpc_id     = module.vpc.vpc_id
-  cidr_block = "172.16.2.0/24"
+  cidr_block = "172.16.1.0/24"
 
   tags = {
     Name        = "k8s-subnet-private-1"
@@ -83,7 +73,7 @@ resource "aws_route_table" "public_rt" {
 
 # Create route table association
 resource "aws_route_table_association" "public_1_rt_a" {
-  subnet_id      = aws_subnet.k8s_cluster_public.id
+  subnet_id      = aws_subnet.k8s_cluster_private.id
   route_table_id = aws_route_table.public_rt.id
 }
 
@@ -93,12 +83,8 @@ module "vpc" {
   version = "3.19.0"
 
   name = "k8s-vpc"
-  cidr = "172.16.0.0/16"
+  cidr = var.k8s_vpc_cidr
   azs = data.aws_availability_zones.available.names
-  # private_subnets = ["172.16.1.0/24", "172.16.2.0/24", "172.16.3.0/24"]
-  # public_subnets = ["172.16.4.0/24", "172.16.5.0/24", "172.16.6.0/24"]
-  # enable_nat_gateway = true
-  # single_nat_gateway = true
   enable_dns_hostnames = true
 }
 
@@ -112,7 +98,14 @@ resource "aws_security_group" "k8s_cluster_sg" {
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "Incoming SSH rule"
+    description = "Incoming ssh rule"
+  }
+  ingress {
+    from_port   = 6443
+    to_port     = 6443
+    protocol    = "tcp"
+    cidr_blocks = [var.k8s_vpc_cidr]
+    description = "Incoming custom https rule"
   }
   egress {
     from_port   = 0
