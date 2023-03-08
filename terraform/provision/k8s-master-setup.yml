@@ -6,6 +6,7 @@
   become: yes
   vars: 
     k8s_version: 1.26.0
+    api_server_ip: 192.168.50.10
     pod_network_cidr: 192.168.0.0/16
     local_user: ubuntu
   tasks:
@@ -20,6 +21,7 @@
         - name: Initialize k8s cluster on master node
           command: >
             kubeadm init 
+            --apiserver-advertise-address {{ api_server_ip }}
             --pod-network-cidr {{ pod_network_cidr }}
             --kubernetes-version {{ k8s_version }}
 
