@@ -1,16 +1,18 @@
 - name: Import common K8s node setup
   import_playbook: k8s-common-setup.yml
 
-- name: Playbook for setting up K8s worker nodes
-  hosts: all
-  become: yes
+- name: Waiting Playbook
+  hosts: localhost
   tasks:
     - name: Wait until the file /tmp/k8s-join-command.sh is present before continuing
       wait_for:
         path: /tmp/k8s-join-command.sh
-      delagate_to: localhost
 
-    - name: Copying k8s join script 
+- name: Playbook for setting up K8s worker nodes
+  hosts: all
+  become: yes
+  tasks:
+    - name: Copying k8s join script
       copy:
         src: /tmp/k8s-join-command.sh
         dest: /tmp/k8s-join-command.sh
