@@ -1,0 +1,9 @@
+- name: Import common K8s node setup
+  import_playbook: k8s-common-setup.yml
+
+- name: Playbook for setting up K8s worker nodes
+  hosts: all
+  become: yes
+  tasks:
+    - name: Running cluster join script
+      command: echo Hello on worker node
