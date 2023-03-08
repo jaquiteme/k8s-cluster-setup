@@ -5,5 +5,15 @@
   hosts: all
   become: yes
   tasks:
-    - name: Running cluster join script
-      command: echo Hello on worker node
+    - name: Wait until the file /tmp/k8s-join-command.sh is present before continuing
+      wait_for:
+        path: /tmp/k8s-join-command.sh
+      delagate_to: localhost
+
+    - name: Copying k8s join script 
+      copy:
+        src: /tmp/k8s-join-command.sh
+        dest: /tmp/k8s-join-command.sh
+
+    - name: Executing k8s join script
+      command: sh /tmp/k8s-join-command.sh

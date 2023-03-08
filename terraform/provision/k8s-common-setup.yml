@@ -112,10 +112,26 @@
             name: "{{ k8s_packages }}"
             state: present
             update_cache: yes
+          notify: Restart containerd
 
         - name: Starting kubelet service
           service:
             name: kubelet
             state: started
             enabled: yes
+
+  # HANDLERS 
+  # Restart Kubelet 
+  handlers:
+    - name: Restart kubelet
+      service:
+        name: kubelet
+        state: restarted
+        enabled: yes
+  # Restart containerd
+    - name: Restart containerd
+      service:
+        name: containerd
+        state: restarted
+        enabled: yes
 
