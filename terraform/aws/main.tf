@@ -7,28 +7,38 @@ terraform {
   }
   required_version = ">= 1.2.0"
 }
+
+# AWS provider config
 provider "aws" {
   region = var.region
   shared_credentials_files = ["./credentials"]
 }
 
+# Create cluster nodes ssh keys
 resource "tls_private_key" "cluster_nodes_key" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
+# Create aws key pair
 resource "aws_key_pair" "generated_key" {
   key_name   = var.key_name
   public_key = tls_private_key.cluster_nodes_key.public_key_openssh
-  provisioner "local-exec" {
-    command = "echo '${tls_private_key.cluster_nodes_key.private_key_pem}' > ./${var.key_name}.pem"
-  }
-  provisioner "local-exec" {
-    command = "echo '${tls_private_key.cluster_nodes_key.public_key_openssh}' > ./${var.key_name}.pub"
-  }
 }
 
-# GET availability zones
+# Copy private key into a file
+resource "local_file" "ssh_private_key_file" {
+  content  = "${tls_private_key.cluster_nodes_key.private_key_pem}"
+  filename = "${path.module}/${var.key_name}.pem"
+}
+
+# Copy public key into a file
+resource "local_file" "ssh_public_key_file" {
+  content  = "${tls_private_key.cluster_nodes_key.public_key_openssh}"
+  filename = "${path.module}/${var.key_name}.pem"
+}
+
+# GET available availability zones
 data "aws_availability_zones" "available" {
   state = "available"
 }
@@ -39,7 +49,7 @@ resource "aws_subnet" "k8s_cluster_private" {
   cidr_block = "172.16.1.0/24"
 
   tags = {
-    Name        = "k8s-subnet-private-1"
+    Name = "k8s-subnet-private-1"
   }
 }
 
@@ -77,7 +87,7 @@ resource "aws_route_table_association" "public_1_rt_a" {
   route_table_id = aws_route_table.public_rt.id
 }
 
-# K8s VPC creation
+# Create K8s  cluster VPC
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "3.19.0"
