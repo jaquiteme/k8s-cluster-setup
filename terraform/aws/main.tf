@@ -22,21 +22,21 @@ resource "tls_private_key" "cluster_nodes_key" {
 
 # Create aws key pair
 resource "aws_key_pair" "generated_key" {
-  key_name   = var.key_name
+  key_name   = var.cluster_def.nodes_ssh_key_name
   public_key = tls_private_key.cluster_nodes_key.public_key_openssh
 }
 
 # Copy private key into a file
 resource "local_file" "ssh_private_key_file" {
   content  = "${tls_private_key.cluster_nodes_key.private_key_pem}"
-  filename = "${path.module}/${var.key_name}.pem"
+  filename = "${path.module}/${var.cluster_def.nodes_ssh_key_name}.pem"
   file_permission = "0600"
 }
 
 # Copy public key into a file
 resource "local_file" "ssh_public_key_file" {
   content  = "${tls_private_key.cluster_nodes_key.public_key_openssh}"
-  filename = "${path.module}/${var.key_name}.pub"
+  filename = "${path.module}/${var.cluster_def.nodes_ssh_key_name}.pub"
 }
 
 # GET available availability zones
@@ -47,7 +47,7 @@ data "aws_availability_zones" "available" {
 # Create Private Subnet for K8s cluster nodes 
 resource "aws_subnet" "k8s_cluster_private" {
   vpc_id     = module.vpc.vpc_id
-  cidr_block = var.k8s_private_subnet_cidr
+  cidr_block = var.cluster_def.private_subnet_cidr
 
   tags = {
     Name = "k8s-subnet-private-1"
@@ -94,7 +94,7 @@ module "vpc" {
   version = "3.19.0"
 
   name = "k8s-vpc"
-  cidr = var.k8s_vpc_cidr
+  cidr = var.cluster_def.vpc_cidr
   azs = data.aws_availability_zones.available.names
   enable_dns_hostnames = true
 }
@@ -114,7 +114,7 @@ locals {
         from = 6443, 
         to = 6443, 
         proto = "tcp", 
-        cidr = [var.k8s_private_subnet_cidr], 
+        cidr = [var.cluster_def.private_subnet_cidr], 
         description = "Incoming custom https rule"
       }
     ]

@@ -1,6 +1,6 @@
 
 resource "aws_instance" "k8s_worker_node" {
-  count                       = var.cluster_worker_count
+  count                       = var.cluster_def.worker_count
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t2.micro"
   key_name                    = aws_key_pair.generated_key.key_name

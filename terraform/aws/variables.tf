@@ -4,32 +4,14 @@ variable "region" {
   description = "AWS region"
 }
 
-variable "k8s_vpc_cidr" {
-  type        = string
-  default     = "172.16.0.0/16"
-  description = "K8s vpc cidr"
+variable "cluster_def" {
+  type = object({
+    master_count = optional(number, 1)
+    worker_count = optional(number, 2)
+    nodes_ssh_key_name = optional(string, "k8s-cluster-key")
+    vpc_cidr = optional(string, "172.16.0.0/16")
+    private_subnet_cidr = optional(string, "172.16.1.0/24")
+  })
+  description = "K8s simple cluster definition"
 }
 
-variable "k8s_private_subnet_cidr" {
-  type        = string
-  default     = "172.16.1.0/24"
-  description = "K8s private subnet cidr"
-}
-
-variable "cluster_master_count" {
-  type        = number
-  default     = 1
-  description = "K8s cluster control nodes count"
-}
-
-variable "cluster_worker_count" {
-  type        = number
-  default     = 2
-  description = "K8s cluster worker nodes count"
-}
-
-variable "key_name" {
-  type        = string
-  default     = "k8s-cluster-key"
-  description = "K8s cluster key"
-}

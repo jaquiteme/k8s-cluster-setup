@@ -1,10 +1,10 @@
 locals {
-  ssh_private_key = "${var.key_name}.pem"
-  ssh_public_key = "${var.key_name}.pub"
+  ssh_private_key = "${var.cluster_def.nodes_ssh_key_name}.pem"
+  ssh_public_key = "${var.cluster_def.nodes_ssh_key_name}.pub"
 }
 
 resource "aws_instance" "k8s_control_node" {
-  count                       = var.cluster_master_count
+  count                       = var.cluster_def.master_count
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t2.medium"
   key_name                    = aws_key_pair.generated_key.key_name
