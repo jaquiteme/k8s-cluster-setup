@@ -36,7 +36,7 @@ resource "local_file" "ssh_private_key_file" {
 # Copy public key into a file
 resource "local_file" "ssh_public_key_file" {
   content  = "${tls_private_key.cluster_nodes_key.public_key_openssh}"
-  filename = "${path.module}/${var.key_name}.pem"
+  filename = "${path.module}/${var.key_name}.pub"
 }
 
 # GET available availability zones
