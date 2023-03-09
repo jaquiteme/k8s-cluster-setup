@@ -127,11 +127,11 @@ resource "aws_security_group" "k8s_cluster_sg" {
   dynamic "ingress" {
     for_each = local.ingress_rules
     content {
-      from_port   = ingress.from
-      to_port     = ingress.to
-      protocol    = ingress.proto
-      cidr_blocks = ingress.cidr
-      description = ingress.description
+      from_port   = ingress.value["from"]
+      to_port     = ingress.value["to"]
+      protocol    = ingress.value["proto"]
+      cidr_blocks = ingress.value["cidr"]
+      description = ingress.value["description"]
     }
   }
   egress {
