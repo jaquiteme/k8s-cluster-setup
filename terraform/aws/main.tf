@@ -30,6 +30,7 @@ resource "aws_key_pair" "generated_key" {
 resource "local_file" "ssh_private_key_file" {
   content  = "${tls_private_key.cluster_nodes_key.private_key_pem}"
   filename = "${path.module}/${var.key_name}.pem"
+  file_permission = "0600"
 }
 
 # Copy public key into a file
