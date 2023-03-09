@@ -10,6 +10,12 @@ variable "k8s_vpc_cidr" {
   description = "K8s vpc cidr"
 }
 
+variable "k8s_private_subnet_cidr" {
+  type        = string
+  default     = "172.16.1.0/24"
+  description = "K8s private subnet cidr"
+}
+
 variable "cluster_master_count" {
   type        = number
   default     = 1

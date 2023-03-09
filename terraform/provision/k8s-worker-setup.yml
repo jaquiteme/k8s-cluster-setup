@@ -1,7 +1,7 @@
 - name: Import common K8s node setup
   import_playbook: k8s-common-setup.yml
 
-- name: Waiting Playbook
+- name: Waiting for some requirements on localhost
   hosts: localhost
   tasks:
     - name: Wait until the file /tmp/k8s-join-command.sh is present before continuing
@@ -19,3 +19,11 @@
 
     - name: Executing k8s join script
       command: sh /tmp/k8s-join-command.sh
+
+- name: Cleanup files on localhost
+  hosts: localhost
+  tasks:
+    - name: Remove k8s join script at the end
+      file:
+        path: /tmp/k8s-join-command.sh
+        state: absent

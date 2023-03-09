@@ -46,7 +46,7 @@ data "aws_availability_zones" "available" {
 # Create Private Subnet for K8s cluster nodes 
 resource "aws_subnet" "k8s_cluster_private" {
   vpc_id     = module.vpc.vpc_id
-  cidr_block = "172.16.1.0/24"
+  cidr_block = var.k8s_private_subnet_cidr
 
   tags = {
     Name = "k8s-subnet-private-1"
@@ -98,24 +98,41 @@ module "vpc" {
   enable_dns_hostnames = true
 }
 
+# Local variables
+locals {
+  # AWS security group ingress rules 
+  ingress_rules = [
+      { 
+        from = 22, 
+        to = 22, 
+        proto = "tcp", 
+        cidr = ["0.0.0.0/0"], 
+        description = "Incoming ssh rule"
+      },
+      { 
+        from = 6443, 
+        to = 6443, 
+        proto = "tcp", 
+        cidr = [var.k8s_private_subnet_cidr], 
+        description = "Incoming custom https rule"
+      }
+    ]
+}
+
 # Create aws security group
 resource "aws_security_group" "k8s_cluster_sg" {
   name        = "k8s-cluster-sg"
   description = "Ingress and egress traffic to K8s EC2 Instance"
   vpc_id      = module.vpc.vpc_id
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Incoming ssh rule"
-  }
-  ingress {
-    from_port   = 6443
-    to_port     = 6443
-    protocol    = "tcp"
-    cidr_blocks = [var.k8s_vpc_cidr]
-    description = "Incoming custom https rule"
+  dynamic "ingress" {
+    for_each = local.ingress_rules
+    content {
+      from_port   = ingress.from
+      to_port     = ingress.to
+      protocol    = ingress.proto
+      cidr_blocks = ingress.cidr
+      description = ingress.description
+    }
   }
   egress {
     from_port   = 0
