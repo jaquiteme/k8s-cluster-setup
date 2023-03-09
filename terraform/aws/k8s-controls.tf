@@ -33,10 +33,10 @@ resource "aws_instance" "k8s_control_node" {
   provisioner "local-exec" {
     # Pay attention of trailing spaces before and after EOT
     command = <<-EOT
-      ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook
-      -u ubuntu -i "${self.public_ip},"
-      --private-key "${local.ssh_private_key}"
-      -e "pub_key=${local.ssh_public_key}"
+      ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
+      -u ubuntu -i "${self.public_ip}," \
+      --private-key "${local.ssh_private_key}" \
+      -e "pub_key=${local.ssh_public_key}" \
       ../provision/k8s-master-setup.yml
     EOT
   }
