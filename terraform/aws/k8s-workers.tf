@@ -27,7 +27,8 @@ resource "aws_instance" "k8s_worker_node" {
   # Local exec run commands immediately when the machine is provisioned
   # Not wait for the end of boot up
   provisioner "local-exec" {
-   command = <<-EOT 
+    # Pay attention of trailing spaces before and after EOT
+    command = <<-EOT
       ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook
       -u ubuntu -i "${self.public_ip},"
       --private-key "${local.ssh_private_key}"
