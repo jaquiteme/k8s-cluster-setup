@@ -25,7 +25,7 @@ variable "cluster_master_count" {
 variable "cluster_worker_count" {
   type        = number
   default     = 2
-  description = l
+  description = "K8s cluster worker nodes count"
 }
 
 variable "key_name" {
