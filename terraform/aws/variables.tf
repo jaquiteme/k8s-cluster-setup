@@ -12,6 +12,7 @@ variable "cluster_def" {
     vpc_cidr = optional(string, "172.16.0.0/16")
     private_subnet_cidr = optional(string, "172.16.1.0/24")
   })
+  default = {}
   description = "K8s simple cluster definition"
 }
 
