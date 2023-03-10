@@ -143,7 +143,6 @@ resource "aws_security_group" "k8s_cluster_sg" {
   }
   tags = {
     Name        = "K8s network acl"
-    Environment = terraform.workspace
   }
 }
 

@@ -37,6 +37,7 @@ resource "aws_instance" "k8s_control_node" {
       -u ubuntu -i "${self.public_ip}," \
       --private-key "${local.ssh_private_key}" \
       -e "pub_key=${local.ssh_public_key}" \
+      -e "k8s_version=${var.cluster_def.k8s_version}" \
       ../provision/k8s-master-setup.yml
     EOT
   }
