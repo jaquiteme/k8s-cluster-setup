@@ -1,52 +1,70 @@
 IMAGE_NAME = "ubuntu/focal64"
-NETWORK = "192.168.50."
-WORK_COUNT = 2
 PROVISION_FOLDER = "../provisioning"
-MASTER_NODE_IP = ""
+NETWORK = "192.168.50."
+MASTERS = Array.new
+WORKERS = Array.new
+WORKER_COUNT = 2
+
+# Function to write to a file with given path and content
+def write_to_file(filename, content)
+    File.write(filename, content, mode: "w")
+end
 
 Vagrant.configure("2") do |config|
-    # config.vm.provider "virtualbox" do |vb|
-    #     vb.memory = 1024
-    #     vb.cpus = 1
-    # end
-
-    config.vm.define "k8s-control-1" do |master| 
-        node_ip = NETWORK + "10"
-        MASTER_NODE_IP = node_ip
-        hostname = "k8s-control-1"
+    config.vm.define "k8s-control-1" do |master|
+        node_info = Hash[node_name: "k8s-control-1", node_ip: NETWORK + "10"]
         master.vm.box = IMAGE_NAME
-        master.vm.hostname = hostname
-        master.vm.network "private_network", ip: MASTER_NODE_IP
+        master.vm.hostname = node_info[:node_name]
+        master.vm.network "private_network", ip: node_info[:node_ip]
         master.ssh.forward_agent = true
         master.vm.provider "virtualbox" do |vb|
             vb.memory = 2048
             vb.cpus = 2
         end
-        # Erase inventory file content if already exists
-        # And append control node host data
-        File.write("#{PROVISION_FOLDER}/only_for_vagrant/inventory", "controller ansible_connection=local\n", mode: "w")
-        File.write("#{PROVISION_FOLDER}/only_for_vagrant/inventory", "#{hostname} ansible_host=#{node_ip} ansible_ssh_private_key_file=/home/vagrant/host_keys/#{hostname}/virtualbox/private_key\n", mode: "a")
+        # Append node info
+        MASTERS.push(node_info)
     end
 
-    (1..WORK_COUNT).each do |node_id|
+    (1..WORKER_COUNT).each do |node_id|
         config.vm.define "k8s-node-#{node_id}" do |node|
-            node_ip = NETWORK + "#{20 + node_id}"
-            hostname = "k8s-node-#{node_id}"
+            node_info = Hash[node_name: "k8s-node-#{node_id}", node_ip: NETWORK + "#{20 + node_id}"]
             node.vm.box = IMAGE_NAME
-            node.vm.hostname = "k8s-node-#{node_id}"
-            node.vm.network "private_network", ip: node_ip
+            node.vm.hostname = node_info[:node_name]
+            node.vm.network "private_network", ip: node_info[:node_ip]
             node.ssh.forward_agent = true
-            # Append worker node hosts data
-            File.write("#{PROVISION_FOLDER}/only_for_vagrant/inventory", "#{hostname} ansible_host=#{node_ip} ansible_ssh_private_key_file=/home/vagrant/host_keys/#{hostname}/virtualbox/private_key\n", mode: "a")
+            node.vm.provider "virtualbox" do |vb_node|
+                vb_node.memory = 1024
+                vb_node.cpus = 1
+            end
+            # Append node info
+            WORKERS.push(node_info)
         end
     end
 
     config.vm.define "controller" do |machine|
-        user_home_dir = "/home/vagrant"
+        # Create inventory file for vagrant
+        inventory_path = "#{PROVISION_FOLDER}/only_for_vagrant/inventory"
+        content = "controller ansible_connection=local\n"
+        # Merge MASTERS and WORKERS arrays
+        nodes = MASTERS.concat(WORKERS)
+        nodes.each do |item|
+            content += "#{item[:node_name]} ansible_host=#{item[:node_ip]} "
+            content += "ansible_ssh_private_key_file=/home/vagrant/host_keys/#{item[:node_name]}/virtualbox/private_key\n"
+        end
+        write_to_file(inventory_path, content)
+        # VM controller setup
         machine.vm.network "private_network", ip: NETWORK + "11"
         machine.vm.box = IMAGE_NAME
         machine.vm.hostname = "controller"
         machine.ssh.forward_agent = true
+        machine.vm.provider "virtualbox" do |vb_ctrl|
+            vb_ctrl.memory = 1024
+            vb_ctrl.cpus = 1
+        end
+        #===================
+        #|   Provisions    |
+        #===================
+        user_home_dir = "/home/vagrant"
         # Copying hosts private key in order to change permissions
         machine.vm.provision "file", source: ".vagrant/machines", destination:"#{user_home_dir}/host_keys"
         # Changing hosts private key permissions for ssh
@@ -62,7 +80,7 @@ Vagrant.configure("2") do |config|
           ansible.inventory_path = "inventory"
           ansible.extra_vars     = {
             local_user: "vagrant",
-            apiserver_address: MASTER_NODE_IP
+            apiserver_address: MASTERS[0][:node_ip]
           }
         end
         # Workers provision

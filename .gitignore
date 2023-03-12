@@ -1,3 +1,7 @@
 *.pem
 *.pub
 *.terraform*
+*tfstate
+*tfstate*
+*.vagrant
+*inventory
