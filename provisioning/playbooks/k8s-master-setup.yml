@@ -1,0 +1,63 @@
+- name: Import common K8s node setup
+  import_playbook: k8s-common-setup.yml
+
+- name: Playbook for setting up K8s master nodes
+  hosts: all
+  become: true
+  vars: 
+    apiserver_address: "{{ ansible_default_ipv4.address }}"
+    k8s_version: 1.26.0
+    pod_network_cidr: 192.168.0.0/16
+    local_user: ubuntu
+  tasks:
+    - name: Initialize cluster if not already initialized
+      block: 
+        - name: Checking if master node already initialized
+          command: kubectl version
+          register: k8s_install_check
+      rescue:
+        # Cluster initialization can take up to 5 minutes, regarding your machine capacities
+        # so, be patient <(^_^)>
+        - name: Initialize k8s cluster on master node
+          command: >
+            kubeadm init 
+            --apiserver-advertise-address {{ apiserver_address }}
+            --pod-network-cidr {{ pod_network_cidr }}
+            --kubernetes-version {{ k8s_version }}
+
+    - name: Setting up kubeconfig for {{ local_user }}
+      block:
+        - name: Create user .kube directory
+          file: 
+            path: /home/{{local_user}}/.kube
+            state: directory
+        
+        - name: Copying K8s sample config
+          copy:
+            src: /etc/kubernetes/admin.conf
+            dest: /home/{{local_user}}/.kube/config
+            owner: "{{ local_user }}"
+            group: "{{ local_user }}"
+            remote_src: yes
+
+    - name: Installing Networking Plugin Calico
+      become: false
+      command: kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
+
+    - name: Generating cluster join command
+      command: kubeadm token create --print-join-command
+      register: k8s_join_command
+
+    - name: Copying cluster join command to a file
+      copy:
+        content: |
+          #!/bin/bash
+          {{ k8s_join_command.stdout }}
+        dest: /tmp/k8s-join-command.sh
+
+    - name: Copying cluster join script to local
+      fetch:
+        src: /tmp/k8s-join-command.sh
+        dest: /tmp/k8s-join-command.sh
+        flat: yes
+
