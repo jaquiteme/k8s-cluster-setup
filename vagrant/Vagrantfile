@@ -1,0 +1,81 @@
+IMAGE_NAME = "ubuntu/focal64"
+NETWORK = "192.168.50."
+WORK_COUNT = 2
+PROVISION_FOLDER = "../provisioning"
+MASTER_NODE_IP = ""
+
+Vagrant.configure("2") do |config|
+    # config.vm.provider "virtualbox" do |vb|
+    #     vb.memory = 1024
+    #     vb.cpus = 1
+    # end
+
+    config.vm.define "k8s-control-1" do |master| 
+        node_ip = NETWORK + "10"
+        MASTER_NODE_IP = node_ip
+        hostname = "k8s-control-1"
+        master.vm.box = IMAGE_NAME
+        master.vm.hostname = hostname
+        master.vm.network "private_network", ip: MASTER_NODE_IP
+        master.ssh.forward_agent = true
+        master.vm.provider "virtualbox" do |vb|
+            vb.memory = 2048
+            vb.cpus = 2
+        end
+        # Erase inventory file content if already exists
+        # And append control node host data
+        File.write("#{PROVISION_FOLDER}/only_for_vagrant/inventory", "controller ansible_connection=local\n", mode: "w")
+        File.write("#{PROVISION_FOLDER}/only_for_vagrant/inventory", "#{hostname} ansible_host=#{node_ip} ansible_ssh_private_key_file=/home/vagrant/host_keys/#{hostname}/virtualbox/private_key\n", mode: "a")
+    end
+
+    (1..WORK_COUNT).each do |node_id|
+        config.vm.define "k8s-node-#{node_id}" do |node|
+            node_ip = NETWORK + "#{20 + node_id}"
+            hostname = "k8s-node-#{node_id}"
+            node.vm.box = IMAGE_NAME
+            node.vm.hostname = "k8s-node-#{node_id}"
+            node.vm.network "private_network", ip: node_ip
+            node.ssh.forward_agent = true
+            # Append worker node hosts data
+            File.write("#{PROVISION_FOLDER}/only_for_vagrant/inventory", "#{hostname} ansible_host=#{node_ip} ansible_ssh_private_key_file=/home/vagrant/host_keys/#{hostname}/virtualbox/private_key\n", mode: "a")
+        end
+    end
+
+    config.vm.define "controller" do |machine|
+        user_home_dir = "/home/vagrant"
+        machine.vm.network "private_network", ip: NETWORK + "11"
+        machine.vm.box = IMAGE_NAME
+        machine.vm.hostname = "controller"
+        machine.ssh.forward_agent = true
+        # Copying hosts private key in order to change permissions
+        machine.vm.provision "file", source: ".vagrant/machines", destination:"#{user_home_dir}/host_keys"
+        # Changing hosts private key permissions for ssh
+        machine.vm.provision "shell", inline: "chmod 0600 #{user_home_dir}/host_keys/*/virtualbox/private_key"
+        machine.vm.provision "file", source: "#{PROVISION_FOLDER}", destination: "#{user_home_dir}/.ansible"
+        # Masters provision
+        machine.vm.provision :ansible_local do |ansible|
+          ansible.provisioning_path  = "#{user_home_dir}/.ansible/only_for_vagrant"
+          ansible.playbook       = "../playbooks/k8s-master-setup.yml"
+          ansible.verbose        = true
+          ansible.install        = true
+          ansible.limit          = "k8s-control-*"
+          ansible.inventory_path = "inventory"
+          ansible.extra_vars     = {
+            local_user: "vagrant",
+            apiserver_address: MASTER_NODE_IP
+          }
+        end
+        # Workers provision
+        machine.vm.provision :ansible_local do |ansible|
+            ansible.provisioning_path  = "#{user_home_dir}/.ansible/only_for_vagrant"
+            ansible.playbook       = "../playbooks/k8s-worker-setup.yml"
+            ansible.verbose        = true
+            ansible.install        = true
+            ansible.limit          = "k8s-node-*"
+            ansible.inventory_path = "inventory"
+            ansible.extra_vars     = {
+                local_user: "vagrant"
+          }
+          end
+    end
+end 
