@@ -2,8 +2,9 @@
 #======================================
 #| K8S SETUP FOR DEBIAN BASED DISTRIB | 
 #======================================
+# /!\ THIS SCRIPT MUST BE RUNNED AS SUDO USER
 
-K8S_VERSION="{$1:-1.26.0-00}"
+K8S_VERSION="${1:-1.26.0-00}"
 
 echo "Setting up containerd required modules..."
 cat <<EOF | sudo tee /etc/modules-load.d/containerd.conf

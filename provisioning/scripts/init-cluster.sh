@@ -5,9 +5,9 @@
 #=====================
 # /!\ DONT RUN THIS SCRIPT AS SUDO USER
 
-K8S_RELEASED_VERSION="{$1:-1.26.0}"
-POD_NET_CIDR="{$2:-192.168.0.0/16}"
-API_SERVER_ADDR="{$3:-$(/bin/hostname -i)}"
+K8S_RELEASED_VERSION="${1:-1.26.0}"
+POD_NET_CIDR="${2:-192.168.0.0/16}"
+API_SERVER_ADDR="${3:-/bin/hostname -i}"
 
 sudo kubectl get nodes
 # Check if the cluster is already init
