@@ -11,9 +11,9 @@ In this repo, you'll find code for:
 ## Contents
 
 * [Requirements](#requirements)
-* [Setting up k8s using Shell scripts or Ansible](#setting-up-k8s-using-shell-scripts-or-ansible)
-* [Setting up k8s using Terraform](#setting-up-k8s-using-terraform)
-* [Setting up k8s using Vagrant](#setting-up-k8s-using-vagrant)
+* [Setting up k8s using Shell scripts or Ansible](#setting-up-k8s-cluster-using-shell-scripts-or-ansible)
+* [Setting up k8s using Terraform](#setting-up-k8s-cluster-using-terraform)
+* [Setting up k8s using Vagrant](#setting-up-k8s-cluster-using-vagrant)
 * [Checking your cluster setup](#checking-your-cluster-setup)
 
 ## Requirements
@@ -40,7 +40,7 @@ Before you begin, you need to install Vagrant on your computer
 git clone https://github.com/jaquiteme/k8s-cluster-setup.git
 ```
 
-## Setting up k8s using Shell scripts or Ansible
+## Setting up k8s cluster using Shell scripts or Ansible
 
 
 - **Shell**
