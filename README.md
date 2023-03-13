@@ -145,9 +145,9 @@ Previous command output snippet:
 
 ```shell
 NAME              STATUS   ROLES           AGE     VERSION
-ip-172-16-1-248   Ready    <none>          9m16s   v1.26.0
-ip-172-16-1-4     Ready    control-plane   9m37s   v1.26.0
-ip-172-16-1-98    Ready    <none>          9m17s   v1.26.0
+ip-172-16-x-x     Ready    <none>          9m16s   v1.26.0
+ip-172-16-x-x     Ready    control-plane   9m37s   v1.26.0
+ip-172-16-x-x     Ready    <none>          9m17s   v1.26.0
 ```
 
 ```shell
