@@ -31,9 +31,9 @@ fi
 mkdir -p /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-apt-get update && sudo apt-get install -y containerd.io
+apt-get update && apt-get install -y containerd.io
 # Removing default containerd config if exists
 if [[ -f "/etc/containerd/config.toml" ]]; then
   rm /etc/containerd/config.toml
@@ -45,14 +45,14 @@ systemctl start containerd
 swapoff -a
 
 # Miscellaneous packages required by K8S
-apt-get update && sudo apt-get install -y ca-certificates apt-transport-https curl
+apt-get update && apt-get install -y ca-certificates apt-transport-https curl
 
 # Download Google cloud public signing key
 mkdir -p /etc/apt/keyrings
 curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
 
 # Add K8S apt 
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
 
 # Install K8S packages
 apt-get update && apt-get install -y \
