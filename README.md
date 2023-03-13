@@ -5,16 +5,16 @@ This project is aiming to ease kubernetes (k8s) cluster creation on different pl
 In this repo, you'll find code for:
 
 * Setting up k8s cluster using raw Shell scripts or Ansible playbooks
-* Setting up k8s cluster using terraform
-* Setting up k8s cluster using vagrant
+* Setting up k8s cluster using Terraform
+* Setting up k8s cluster using Vagrant
 
 ## Contents
 
-* Requirements
-* Setting up k8s using Shell scripts or Ansible
-* Setting up k8s using Terraform
-* Setting up k8s using Vagrant
-* Checking your cluster setup
+* [Requirements](#requirements)
+* [Setting up k8s using Shell scripts or Ansible](#setting-up-k8s-using-shell-scripts-or-ansible)
+* [Setting up k8s using Terraform](#setting-up-k8s-using-terraform)
+* [Setting up k8s using Vagrant](#setting-up-k8s-using-vagrant)
+* [Checking your cluster setup](#checking-your-cluster-setup)
 
 ## Requirements
 
@@ -98,11 +98,11 @@ To setup your k8s cluster using Ansible, you'll need:
 
 :bulb: You can also use these playbooks with your customized ansible.cfg and inventory.
 
-- **Terraform**
+## Setting up k8s cluster using Terraform
 
 To setup your k8s cluster using Terraform, you'll need: 
 
-* On AWS cloud provider
+- On AWS cloud provider
 
 1. Edit ``credentials`` file and add your AWS access key id and secret access key
 
@@ -123,7 +123,7 @@ cd k8s-cluster-setup/terraform/aws && terraform init
 cd k8s-cluster-setup/terraform/aws && terraform apply
 ```
 
-- **Vagrant**
+## Setting up k8s cluster using Vagrant
 
 To setup your k8s cluster using Vagrant, you'll need to run the following command.
 
