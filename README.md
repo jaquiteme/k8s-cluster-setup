@@ -83,7 +83,7 @@ To setup your k8s cluster using Ansible, you'll need:
       -u YOUR_USER_NAME -i "YOUR_MASTER_NODE_IP," \
       --private-key "YOUR_USER_PRIVATE_KEY" \
       -e "pub_key=YOUR_USER_PUBLIC_KEY" \
-      ../../provisioning/playbooks/k8s-master-setup.yml
+      k8s-cluster-setup/provisioning/playbooks/k8s-master-setup.yml
 ```
 
 2. Run ``k8s-cluster-setup/provisioning/playbooks/k8s-worker-setup.yml`` playbook on your worker nodes
@@ -93,7 +93,7 @@ To setup your k8s cluster using Ansible, you'll need:
       -u YOUR_USER_NAME -i "YOUR_MASTER_NODE_IP," \
       --private-key "YOUR_USER_PRIVATE_KEY" \
       -e "pub_key=YOUR_USER_PUBLIC_KEY" \
-      ../../provisioning/playbooks/k8s-worker-setup.yml
+      k8s-cluster-setup/provisioning/playbooks/k8s-worker-setup.yml
 ```
 
 :bulb: You can also use these playbooks with your customized ansible.cfg and inventory.
@@ -132,7 +132,75 @@ cd k8s-cluster-setup/vagrant
 vagrant up
 ```
 
-:caution: The vagrant setup was tested only on a Windows machine.
+:warning: The vagrant setup was only tested on a Windows machine.
 
 ## Checking your cluster setup
-[TODO]
+
+To confirm that your k8s cluster is propelly setup, you'll need the run following commands on your master node.
+
+```shell
+kubectl get nodes
+```
+Previous command output snippet:
+
+```shell
+NAME              STATUS   ROLES           AGE     VERSION
+ip-172-16-1-248   Ready    <none>          9m16s   v1.26.0
+ip-172-16-1-4     Ready    control-plane   9m37s   v1.26.0
+ip-172-16-1-98    Ready    <none>          9m17s   v1.26.0
+```
+
+```shell
+kubectl get cs
+```
+Previous command output snippet:
+
+```shell
+NAME                 STATUS    MESSAGE                         ERROR
+controller-manager   Healthy   ok                              
+scheduler            Healthy   ok                              
+etcd-0               Healthy   {"health":"true","reason":""}  
+```
+
+### How to connect on the master node ?
+
+- Raw shell and Ansible
+
+If you setup your cluster using raw Shell or Ansible, connect to the master node with credentials and the node ip address.
+
+- Terraform 
+
+If you setup your cluster using Terraform, connect to the master node using following steps:
+
+:warning: Ensure to execute the followings commands in ``k8s-cluster-setup/terraform/aws`` directory.
+
+* Print terraform output
+
+```shell
+terraform output k8s_control_node_ips
+```
+
+Previous command output snippet:
+
+```json
+{
+  "k8s-control-0" = "x.x.x.x"
+}
+```
+
+* Copy ``k8s-control-0`` ip address and paste in ssh command
+
+```shell
+ssh -i k8s-cluster-key.pem ubuntu@YOUR_MASTER_NODE_IP
+```
+
+- Vagrant
+
+If you setup your cluster using Vagrant, connect to the master using the following command
+
+:warning: Ensure to execute the following command in ``k8s-cluster-setup/vagant`` directory.
+
+```shell
+vagrant ssh k8s-control-1
+```
+
