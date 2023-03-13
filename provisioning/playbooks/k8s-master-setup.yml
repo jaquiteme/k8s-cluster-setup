@@ -23,7 +23,7 @@
             kubeadm init 
             --apiserver-advertise-address {{ apiserver_address }}
             --pod-network-cidr {{ pod_network_cidr }}
-            --kubernetes-version {{ k8s_version[:5] }}
+            --kubernetes-version {{ k8s_version[:6] }}
 
     - name: Setting up kubeconfig for {{ local_user }}
       block:
