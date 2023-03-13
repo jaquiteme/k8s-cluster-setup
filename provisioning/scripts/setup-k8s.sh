@@ -7,7 +7,7 @@
 K8S_VERSION="${1:-1.26.0-00}"
 
 echo "Setting up containerd required modules..."
-cat <<EOF | sudo tee /etc/modules-load.d/containerd.conf
+cat <<EOF | tee /etc/modules-load.d/containerd.conf
 overlay
 br_netfilter
 EOF
@@ -15,7 +15,7 @@ EOF
 modprobe overlay && modprobe br_netfilter
 
 echo "Setting up systcl conf..."
-cat <<EOF | sudo tee /etc/sysctl.d/99-kubernetes-cri.conf
+cat <<EOF | tee /etc/sysctl.d/99-kubernetes-cri.conf
 net.bridge.bridge-nf-call-iptables = 1
 net.ipv4.ip_forward = 1
 net.bridge.bridge-nf-call-ip6tables = 1
@@ -55,7 +55,13 @@ curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cl
 echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
 # Install K8S packages
-apt-get update && apt-get install -y kubelet="$K8S_VERSION" kubeadm="$K8S_VERSION" kubectl="$K8S_VERSION"
+apt-get update && apt-get install -y \
+  kubelet="$K8S_VERSION" \
+  kubeadm="$K8S_VERSION" \
+  kubectl="$K8S_VERSION" \
+  --allow-change-held-packages
 
 # Freeze K8s package versions
-apt-mark hold kubelet kubeadm kubectl
+if [[ $? -eq 0]]; then
+  apt-mark hold kubelet kubeadm kubectl
+fi
