@@ -62,6 +62,6 @@ apt-get update && apt-get install -y \
   --allow-change-held-packages
 
 # Freeze K8s package versions
-if [[ $? -eq 0]]; then
+if [[ $? -eq 0 ]]; then
   apt-mark hold kubelet kubeadm kubectl
 fi
