@@ -115,7 +115,42 @@ locals {
         to = 6443, 
         proto = "tcp", 
         cidr = [var.cluster_def.private_subnet_cidr], 
-        description = "Incoming custom https rule"
+        description = "Incoming K8s custom https rule"
+      },
+      { 
+        from = 2379, 
+        to = 2380, 
+        proto = "tcp", 
+        cidr = [var.cluster_def.private_subnet_cidr], 
+        description = "Incoming k8s etcd server client API"
+      },
+      { 
+        from = 10250, 
+        to = 10250, 
+        proto = "tcp", 
+        cidr = [var.cluster_def.private_subnet_cidr], 
+        description = "Incoming k8s kubelet API"
+      },
+      { 
+        from = 10259, 
+        to = 10259, 
+        proto = "tcp", 
+        cidr = [var.cluster_def.private_subnet_cidr], 
+        description = "Incoming k8s kube-scheduler"
+      },
+      { 
+        from = 10257, 
+        to = 10257, 
+        proto = "tcp", 
+        cidr = [var.cluster_def.private_subnet_cidr], 
+        description = "Incoming k8s kube-controller-manager"
+      },
+      { 
+        from = 30000, 
+        to = 32767, 
+        proto = "tcp", 
+        cidr = [var.cluster_def.private_subnet_cidr], 
+        description = "Incoming k8s NodePort Services"
       }
     ]
 }
