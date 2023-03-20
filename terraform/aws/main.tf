@@ -151,6 +151,20 @@ locals {
         proto = "tcp", 
         cidr = [var.cluster_def.private_subnet_cidr], 
         description = "Incoming k8s NodePort Services"
+      },
+      { 
+        from = 53, 
+        to = 53, 
+        proto = "tcp", 
+        cidr = [var.cluster_def.private_subnet_cidr], 
+        description = "Incoming k8s DNS plugin BGP"
+      },
+      { 
+        from = 179, 
+        to = 179, 
+        proto = "tcp", 
+        cidr = [var.cluster_def.private_subnet_cidr], 
+        description = "Incoming Calico plugin BGP"
       }
     ]
 }
