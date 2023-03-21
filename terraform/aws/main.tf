@@ -103,68 +103,75 @@ module "vpc" {
 locals {
   # AWS security group ingress rules 
   ingress_rules = [
+      # { 
+      #   from = 22, 
+      #   to = 22, 
+      #   proto = "tcp", 
+      #   cidr = ["0.0.0.0/0"], 
+      #   description = "Incoming ssh rule"
+      # },
+      # { 
+      #   from = 6443, 
+      #   to = 6443, 
+      #   proto = "tcp", 
+      #   cidr = [var.cluster_def.private_subnet_cidr], 
+      #   description = "Incoming K8s custom https rule"
+      # },
+      # { 
+      #   from = 2379, 
+      #   to = 2380, 
+      #   proto = "tcp", 
+      #   cidr = [var.cluster_def.private_subnet_cidr], 
+      #   description = "Incoming k8s etcd server client API"
+      # },
+      # { 
+      #   from = 10250, 
+      #   to = 10250, 
+      #   proto = "tcp", 
+      #   cidr = [var.cluster_def.private_subnet_cidr], 
+      #   description = "Incoming k8s kubelet API"
+      # },
+      # { 
+      #   from = 10259, 
+      #   to = 10259, 
+      #   proto = "tcp", 
+      #   cidr = [var.cluster_def.private_subnet_cidr], 
+      #   description = "Incoming k8s kube-scheduler"
+      # },
+      # { 
+      #   from = 10257, 
+      #   to = 10257, 
+      #   proto = "tcp", 
+      #   cidr = [var.cluster_def.private_subnet_cidr], 
+      #   description = "Incoming k8s kube-controller-manager"
+      # },
+      # { 
+      #   from = 30000, 
+      #   to = 32767, 
+      #   proto = "tcp", 
+      #   cidr = [var.cluster_def.private_subnet_cidr], 
+      #   description = "Incoming k8s NodePort Services"
+      # },
+      # { 
+      #   from = 53, 
+      #   to = 53, 
+      #   proto = "tcp", 
+      #   cidr = [var.cluster_def.private_subnet_cidr], 
+      #   description = "Incoming k8s DNS plugin BGP"
+      # },
+      # { 
+      #   from = 179, 
+      #   to = 179, 
+      #   proto = "tcp", 
+      #   cidr = [var.cluster_def.private_subnet_cidr], 
+      #   description = "Incoming Calico plugin BGP"
+      # }
       { 
-        from = 22, 
-        to = 22, 
-        proto = "tcp", 
-        cidr = ["0.0.0.0/0"], 
-        description = "Incoming ssh rule"
-      },
-      { 
-        from = 6443, 
-        to = 6443, 
-        proto = "tcp", 
+        from = 0, 
+        to = 0, 
+        proto = "-1", 
         cidr = [var.cluster_def.private_subnet_cidr], 
-        description = "Incoming K8s custom https rule"
-      },
-      { 
-        from = 2379, 
-        to = 2380, 
-        proto = "tcp", 
-        cidr = [var.cluster_def.private_subnet_cidr], 
-        description = "Incoming k8s etcd server client API"
-      },
-      { 
-        from = 10250, 
-        to = 10250, 
-        proto = "tcp", 
-        cidr = [var.cluster_def.private_subnet_cidr], 
-        description = "Incoming k8s kubelet API"
-      },
-      { 
-        from = 10259, 
-        to = 10259, 
-        proto = "tcp", 
-        cidr = [var.cluster_def.private_subnet_cidr], 
-        description = "Incoming k8s kube-scheduler"
-      },
-      { 
-        from = 10257, 
-        to = 10257, 
-        proto = "tcp", 
-        cidr = [var.cluster_def.private_subnet_cidr], 
-        description = "Incoming k8s kube-controller-manager"
-      },
-      { 
-        from = 30000, 
-        to = 32767, 
-        proto = "tcp", 
-        cidr = [var.cluster_def.private_subnet_cidr], 
-        description = "Incoming k8s NodePort Services"
-      },
-      { 
-        from = 53, 
-        to = 53, 
-        proto = "tcp", 
-        cidr = [var.cluster_def.private_subnet_cidr], 
-        description = "Incoming k8s DNS plugin BGP"
-      },
-      { 
-        from = 179, 
-        to = 179, 
-        proto = "tcp", 
-        cidr = [var.cluster_def.private_subnet_cidr], 
-        description = "Incoming Calico plugin BGP"
+        description = "All K8s traffic"
       }
     ]
 }
