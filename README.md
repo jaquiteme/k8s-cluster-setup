@@ -15,6 +15,7 @@ In this repo, you'll find code for:
 * [Setting up k8s using Terraform](#setting-up-k8s-cluster-using-terraform)
 * [Setting up k8s using Vagrant](#setting-up-k8s-cluster-using-vagrant)
 * [Checking your cluster setup](#checking-your-cluster-setup)
+* [Troubleshooting](#troubleshooting)
 
 ## Requirements
 
@@ -203,4 +204,34 @@ If you setup your cluster using Vagrant, connect to the master using the followi
 ```shell
 vagrant ssh k8s-control-1
 ```
+
+## Troubleshooting
+
+### Network
+
+When you are facing network issues, first check if the CNI plugin pods are running.
+
+```shell
+kubectl get pods --namespace=kube-system | grep calico
+```
+
+Previous command output snippet:
+
+```shell
+calico-kube-controllers-57b57c56f-z4gj7   1/1     Running   0          14m
+calico-node-99rpm                         1/1     Running   0          14m
+calico-node-g88rm                         1/1     Running   0          14m
+calico-node-wt47z                         1/1     Running   0          14m
+```
+
+If your CNI plugin pods are not running, please try these:
+
+1. Access to pods logs 
+
+
+```shell
+kubectl logs --namespace=kube-system <pod_name>
+```
+
+2. Check also firewall rules
 
