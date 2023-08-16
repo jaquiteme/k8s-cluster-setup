@@ -4,6 +4,7 @@
   become: true
   vars:
     k8s_version: 1.26.0-00
+    k8s_releases_version: "{{ k8s_version[0:4] }}"
     k8s_required_packages:
       - apt-transport-https
       - ca-certificates
@@ -11,9 +12,9 @@
       - gnupg-agent
       - software-properties-common
     k8s_packages:
-      - kubeadm={{ k8s_version }}
-      - kubelet={{ k8s_version }}
-      - kubectl={{ k8s_version }}
+      - kubeadm
+      - kubelet
+      - kubectl
   tasks:
     - name: Installing required packages
       apt:
@@ -98,12 +99,12 @@
       block:
         - name: Adding K8s gpg key using url
           apt_key:
-            url: https://pkgs.k8s.io/core:/stable:/v{{ k8s_version[0:4] }}/deb/Release.key
+            url: https://pkgs.k8s.io/core:/stable:/v{{ k8s_releases_version }}/deb/Release.key
             state: present
 
         - name: Adding kubernetes apt repository
           apt_repository:
-            repo: deb https://pkgs.k8s.io/core:/stable:/v{{ k8s_version[0:3] }}/deb/ /
+            repo: deb https://pkgs.k8s.io/core:/stable:/v{{ k8s_releases_version }}/deb/ /
             state: present
             filename: kubernetes
 

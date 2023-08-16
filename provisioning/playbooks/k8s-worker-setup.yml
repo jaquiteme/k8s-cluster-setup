@@ -19,11 +19,3 @@
 
     - name: Executing k8s join script
       command: sh /tmp/k8s-join-command.sh
-
-- name: Cleanup files on localhost
-  hosts: localhost
-  tasks:
-    - name: Remove k8s join script at the end
-      file:
-        path: /tmp/k8s-join-command.sh
-        state: absent
