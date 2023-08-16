@@ -98,12 +98,12 @@
       block:
         - name: Adding K8s gpg key using url
           get_url:
-            url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-            dest: /etc/apt/keyrings/kubernetes-archive-keyring.gpg
+            url: https://pkgs.k8s.io/core:/stable:/v1.24/deb/Release.key
+            dest: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
         - name: Adding kubernetes apt repository
           apt_repository:
-            repo: deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main
+            repo: deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.24/deb/ /
             state: present
             filename: kubernetes
 

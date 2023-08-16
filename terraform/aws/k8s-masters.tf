@@ -3,7 +3,7 @@ locals {
   ssh_public_key = "${var.cluster_def.nodes_ssh_key_name}.pub"
 }
 
-resource "aws_instance" "k8s_control_node" {
+resource "aws_instance" "k8s_master_node" {
   count                       = var.cluster_def.master_count
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t2.medium"
@@ -13,7 +13,7 @@ resource "aws_instance" "k8s_control_node" {
   associate_public_ip_address = true
 
   tags = {
-    Name = "k8s-control-${count.index}"
+    Name = "k8s-master-${count.index}"
   }
 
   # Running remote-exec to make sure that ssh is up and running
