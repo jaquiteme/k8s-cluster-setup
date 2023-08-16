@@ -96,19 +96,14 @@
 
     - name: Installing K8s packages
       block:
-        - name: Download K8s gpg key using url
-          get_url:
-            url: https://pkgs.k8s.io/core:/stable:/v1.24/deb/Release.key
-            dest: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-
         - name: Adding K8s gpg key using url
           apt_key:
-            file: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+            url: https://pkgs.k8s.io/core:/stable:/v{{ k8s_version[0:3] }}/deb/Release.key
             state: present
 
         - name: Adding kubernetes apt repository
           apt_repository:
-            repo: deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.24/deb/ /
+            repo: deb https://pkgs.k8s.io/core:/stable:/v{{ k8s_version[0:3] }}/deb/ /
             state: present
             filename: kubernetes
 
