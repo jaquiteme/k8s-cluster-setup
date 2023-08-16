@@ -98,7 +98,7 @@
       block:
         - name: Adding K8s gpg key using url
           apt_key:
-            url: https://pkgs.k8s.io/core:/stable:/v{{ k8s_version[0:3] }}/deb/Release.key
+            url: https://pkgs.k8s.io/core:/stable:/v{{ k8s_version[0:4] }}/deb/Release.key
             state: present
 
         - name: Adding kubernetes apt repository
