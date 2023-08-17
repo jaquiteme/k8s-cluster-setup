@@ -88,7 +88,7 @@ resource "aws_route_table_association" "public_1_rt_a" {
   route_table_id = aws_route_table.public_rt.id
 }
 
-# Create K8s  cluster VPC
+# Create K8s cluster VPC
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "3.19.0"
@@ -112,10 +112,17 @@ locals {
       },
       { 
         from = 0, 
+        to = 6443, 
+        proto = "tcp", 
+        cidr = ["0.0.0.0/0"], 
+        description = "Incoming custom K8s https Control node API"
+      },
+      { 
+        from = 0, 
         to = 0, 
         proto = "-1", 
         cidr = [var.cluster_def.private_subnet_cidr], 
-        description = "All K8s traffic"
+        description = "All K8s traffic inside the subnet"
       }
     ]
 }
