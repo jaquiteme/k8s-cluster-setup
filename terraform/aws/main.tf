@@ -26,7 +26,7 @@ resource "aws_key_pair" "generated_key" {
   public_key = tls_private_key.cluster_nodes_key.public_key_openssh
 }
 
-# Copy private key into a file
+# Copy private key into a file and store it in your local folder
 resource "local_file" "ssh_private_key_file" {
   content  = "${tls_private_key.cluster_nodes_key.private_key_pem}"
   filename = "${path.module}/${var.cluster_def.nodes_ssh_key_name}.pem"

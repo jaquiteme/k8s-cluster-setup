@@ -11,17 +11,18 @@ resource "aws_instance" "k8s_worker_node" {
     Name = "k8s-node-${count.index}"
   }
 
-  
   # Running remote-exec to make sure that ssh is up and running
   # In this case before running Ansible playbook on local-exec
   provisioner "remote-exec" {
-   inline = ["echo 'Hello from the node'"]
-   connection {
-     host        = self.public_ip
-     type        = "ssh"
-     user        = "ubuntu"
-     private_key = file(local.ssh_private_key)
-   }
+    inline = ["echo 'Hello from the node'"]
+    connection {
+      host        = self.public_ip
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = <<EOF
+      ${local_file.ssh_private_key_file.content}
+      EOF
+    }
   }
 
   # Local exec run commands immediately when the machine is provisioned

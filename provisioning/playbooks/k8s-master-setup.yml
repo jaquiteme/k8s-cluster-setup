@@ -4,14 +4,15 @@
 - name: Playbook for setting up K8s master nodes
   hosts: all
   become: true
-  vars: 
+  vars:
     apiserver_address: "{{ ansible_default_ipv4.address }}"
     k8s_version: 1.26.0
     pod_network_cidr: 192.168.0.0/16
     local_user: ubuntu
+    calico_release: v3.25.0
   tasks:
     - name: Initialize cluster if not already initialized
-      block: 
+      block:
         - name: Checking if master node already initialized
           command: kubectl version
           register: k8s_install_check
@@ -21,17 +22,22 @@
         - name: Initialize k8s cluster on master node
           command: >
             kubeadm init 
-            --apiserver-advertise-address {{ apiserver_address }}
+            --apiserver-advertise-address 0.0.0.0
             --pod-network-cidr {{ pod_network_cidr }}
             --kubernetes-version {{ k8s_version[:6] }}
+          register: result
+          ignore_errors: true
+          until: result.rc == 0
+          retries: 5
+          delay: 30
 
     - name: Setting up kubeconfig for {{ local_user }}
       block:
         - name: Create user .kube directory
-          file: 
+          file:
             path: /home/{{local_user}}/.kube
             state: directory
-        
+
         - name: Copying K8s sample config
           copy:
             src: /etc/kubernetes/admin.conf
@@ -42,7 +48,12 @@
 
     - name: Installing Networking Plugin Calico
       become: false
-      command: kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
+      command: "kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/{{ calico_release }}/manifests/calico.yaml"
+      register: result
+      ignore_errors: true
+      until: result.rc == 0
+      retries: 5
+      delay: 30
 
     - name: Generating cluster join command
       command: kubeadm token create --print-join-command
@@ -60,4 +71,3 @@
         src: /tmp/k8s-join-command.sh
         dest: /tmp/k8s-join-command.sh
         flat: yes
-

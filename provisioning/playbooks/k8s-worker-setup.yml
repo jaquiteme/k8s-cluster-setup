@@ -19,3 +19,7 @@
 
     - name: Executing k8s join script
       command: sh /tmp/k8s-join-command.sh
+      register: result
+      until: result is success
+      retries: 5
+      delay: 30
