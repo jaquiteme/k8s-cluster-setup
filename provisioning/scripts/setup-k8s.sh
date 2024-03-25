@@ -1,6 +1,6 @@
 #!/bin/bash
 #======================================
-#| K8S SETUP FOR DEBIAN BASED DISTRIB | 
+#| K8S SETUP FOR DEBIAN BASED DISTRIB |
 #======================================
 # /!\ THIS SCRIPT MUST BE RUNNED AS SUDO USER
 
@@ -23,22 +23,22 @@ EOF
 
 update_sysctl=$(sysctl --system)
 if [[ $? -eq 0 ]]; then
-   echo "Sysctl successfully reloaded"
+    echo "Sysctl successfully reloaded"
 fi
 
 # Install containerd.io following docker installation
 # https://forum.linuxfoundation.org/discussion/862825/kubeadm-init-error-cri-v1-runtime-api-is-not-implemented
 mkdir -p /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
-  gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
-  tee /etc/apt/sources.list.d/docker.list > /dev/null
+tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 apt-get update && apt-get install -y containerd.io
 # Removing default containerd config if exists
 if [[ -f "/etc/containerd/config.toml" ]]; then
-  rm /etc/containerd/config.toml
+    rm /etc/containerd/config.toml
 fi
 # Starting containerd service
 systemctl start containerd
@@ -53,18 +53,18 @@ apt-get update && apt-get install -y ca-certificates apt-transport-https curl
 mkdir -p /etc/apt/keyrings
 curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
 
-# Add K8S apt 
+# Add K8S apt
 echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | \
- tee /etc/apt/sources.list.d/kubernetes.list
+tee /etc/apt/sources.list.d/kubernetes.list
 
 # Install K8S packages
 apt-get update && apt-get install -y \
-  kubelet="$K8S_VERSION" \
-  kubeadm="$K8S_VERSION" \
-  kubectl="$K8S_VERSION" \
-  --allow-change-held-packages
+kubelet="$K8S_VERSION" \
+kubeadm="$K8S_VERSION" \
+kubectl="$K8S_VERSION" \
+--allow-change-held-packages
 
 # Freeze K8s package versions
 if [[ $? -eq 0 ]]; then
-  apt-mark hold kubelet kubeadm kubectl
+    apt-mark hold kubelet kubeadm kubectl
 fi

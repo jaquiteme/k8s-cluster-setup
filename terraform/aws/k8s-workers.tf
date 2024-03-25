@@ -19,7 +19,7 @@ resource "aws_instance" "k8s_worker_node" {
       host        = self.public_ip
       type        = "ssh"
       user        = "ubuntu"
-      private_key = <<EOF
+      private_key = <<-EOF
       ${local_file.ssh_private_key_file.content}
       EOF
     }
