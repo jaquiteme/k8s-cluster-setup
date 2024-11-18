@@ -119,7 +119,6 @@
           get_url:
             url: https://pkgs.k8s.io/core:/stable:/v{{ k8s_releases_version }}/deb/Release.key
             dest: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-            state: present
 
         - name: Adding kubernetes v{{ k8s_releases_version }} apt repository
           apt_repository:
