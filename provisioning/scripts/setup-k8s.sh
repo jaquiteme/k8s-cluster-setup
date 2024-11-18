@@ -51,13 +51,13 @@ apt-get update && apt-get install -y ca-certificates apt-transport-https curl gp
 
 # Download Google cloud public signing key
 mkdir -p /etc/apt/keyrings
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | \
+curl -fsSL "https://pkgs.k8s.io/core:/stable:/v${K8S_VERSION}/deb/Release.key" | \
     gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
 
 # Add K8S apt
-echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v${K8S_VERSION}/deb/ /' | \
-tee /etc/apt/sources.list.d/kubernetes.list
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v${K8S_VERSION}/deb/ /" | \
+    tee /etc/apt/sources.list.d/kubernetes.list
 
 # Install K8S packages
 apt-get update && apt-get install -y \
