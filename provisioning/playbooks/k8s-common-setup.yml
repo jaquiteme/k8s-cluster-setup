@@ -11,6 +11,7 @@
       - curl
       - gnupg-agent
       - software-properties-common
+      - gpg
     k8s_packages:
       - kubeadm
       - kubelet
@@ -68,6 +69,7 @@
           apt_key:
             url: https://download.docker.com/linux/ubuntu/gpg
             state: present
+
         - name: Adding docker apt repository
           apt_repository:
             repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_facts['distribution_release'] }} stable
@@ -109,16 +111,8 @@
 
     - name: Installing K8s packages
       block:
-        - name: Adding keyring directory if not exists
-          file:
-            path: /etc/apt/keyrings
-            mode: '0755'
-            state: directory
-
-        - name: Getting K8s v{{ k8s_releases_version }} gpg release key
-          get_url:
-            url: https://pkgs.k8s.io/core:/stable:/v{{ k8s_releases_version }}/deb/Release.key
-            dest: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+        - name: Getting K8s PGP v{{ k8s_releases_version }} repo release key and converting it to GPG key
+          command: "curl -fsSL https://pkgs.k8s.io/core:/stable:/v{{ k8s_releases_version }}/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg"
 
         - name: Adding kubernetes v{{ k8s_releases_version }} apt repository
           apt_repository:
