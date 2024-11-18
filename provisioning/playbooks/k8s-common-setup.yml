@@ -109,12 +109,12 @@
 
     - name: Installing K8s packages
       block:
-        - name: Adding K8s gpg key using url
+        - name: Adding K8s v{{ k8s_releases_version }} gpg key using url
           apt_key:
             url: https://pkgs.k8s.io/core:/stable:/v{{ k8s_releases_version }}/deb/Release.key
             state: present
 
-        - name: Adding kubernetes apt repository
+        - name: Adding kubernetes v{{ k8s_releases_version }} apt repository
           apt_repository:
             repo: deb https://pkgs.k8s.io/core:/stable:/v{{ k8s_releases_version }}/deb/ /
             state: present
