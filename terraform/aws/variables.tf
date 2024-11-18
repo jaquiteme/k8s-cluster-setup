@@ -6,7 +6,7 @@ variable "region" {
 
 variable "cluster_def" {
   type = object({
-    k8s_version = optional(string, "1.26.0-00")
+    k8s_version = optional(string, "1.28.0-00")
     master_count = optional(number, 1)
     worker_count = optional(number, 2)
     nodes_ssh_key_name = optional(string, "k8s-cluster-key")
