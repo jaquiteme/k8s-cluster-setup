@@ -2,9 +2,9 @@
 #======================================
 #| K8S SETUP FOR DEBIAN BASED DISTRIB |
 #======================================
-# /!\ THIS SCRIPT MUST BE RUNNED AS SUDO USER
+# /!\ THIS SCRIPT MUST BE RUN AS SUDO USER
 
-K8S_VERSION="${1:-1.26.0-00}"
+K8S_VERSION="${1:-1.28.0}"
 
 echo "Setting up containerd required modules..."
 cat <<EOF | tee /etc/modules-load.d/containerd.conf
@@ -47,14 +47,16 @@ systemctl start containerd
 swapoff -a
 
 # Miscellaneous packages required by K8S
-apt-get update && apt-get install -y ca-certificates apt-transport-https curl
+apt-get update && apt-get install -y ca-certificates apt-transport-https curl gpg
 
 # Download Google cloud public signing key
 mkdir -p /etc/apt/keyrings
-curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | \
+    gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
 
 # Add K8S apt
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | \
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v${K8S_VERSION}/deb/ /' | \
 tee /etc/apt/sources.list.d/kubernetes.list
 
 # Install K8S packages

@@ -3,7 +3,7 @@
   hosts: all
   become: true
   vars:
-    k8s_version: 1.26.0-00
+    k8s_version: 1.28.0
     k8s_releases_version: "{{ k8s_version[0:4] }}"
     k8s_required_packages:
       - apt-transport-https
