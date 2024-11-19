@@ -39,18 +39,3 @@ resource "aws_instance" "k8s_worker_node" {
   #   EOT
   # }
 }
-
-resource "terraform_data" "k8s_node_ansible_inventory" {
-  triggers_replace = [
-    aws_instance.k8s_worker_node[*].id
-  ]
-
-  provisioner "local-exec" {
-    command = "echo [nodes] >> inventory"
-  }
-
-  provisioner "local-exec" {
-    command = "echo '${join("\n",aws_instance.k8s_worker_node[*].public_ip)}' >> inventory"
-  }
-}
-

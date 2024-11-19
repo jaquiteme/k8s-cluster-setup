@@ -44,17 +44,3 @@ resource "aws_instance" "k8s_master_node" {
   #   EOT
   # }
 }
-
-resource "terraform_data" "k8s_master_ansible_inventory" {
-  triggers_replace = [
-    aws_instance.k8s_master_node[*].id
-  ]
-
-  provisioner "local-exec" {
-    command = "echo [masters] > inventory"
-  }
-
-  provisioner "local-exec" {
-    command = "echo '${join("\n",aws_instance.k8s_master_node[*].public_ip)}' >> inventory"
-  }
-}
