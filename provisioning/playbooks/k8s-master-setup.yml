@@ -1,3 +1,11 @@
+- name: Deleting some files before installation begin
+  hosts: localhost
+  tasks:
+    - name: Deleting /tmp/k8s-join-command.sh if it is present before continuing
+      file:
+        path: /tmp/k8s-join-command.sh
+        state: absent
+
 - name: Import common K8s node setup
   import_playbook: k8s-common-setup.yml
 
