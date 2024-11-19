@@ -55,6 +55,6 @@ resource "terraform_data" "k8s_master_ansible_inventory" {
   }
 
   provisioner "local-exec" {
-    command = "echo ${join("\n",aws_instance.k8s_master_node[*].public_ip)} >> inventory"
+    command = "echo '${join("\n",aws_instance.k8s_master_node[*].public_ip)}' >> inventory"
   }
 }
