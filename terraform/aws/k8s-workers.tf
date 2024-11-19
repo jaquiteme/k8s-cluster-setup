@@ -27,16 +27,30 @@ resource "aws_instance" "k8s_worker_node" {
 
   # Local exec run commands immediately when the machine is provisioned
   # Not wait for the end of boot up
+  # provisioner "local-exec" {
+  #   # Pay attention of trailing spaces before and after EOT
+  #   command = <<-EOT
+  #     ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
+  #     -u ubuntu -i "${self.public_ip}," \
+  #     --private-key "${local.ssh_private_key}" \
+  #     -e "pub_key=${local.ssh_public_key}" \
+  #     -e "k8s_version=${var.cluster_def.k8s_version}" \
+  #     ../../provisioning/playbooks/k8s-worker-setup.yml
+  #   EOT
+  # }
+}
+
+resource "terraform_data" "k8s_node_ansible_inventory" {
+  triggers_replace = [
+    aws_instance.k8s_worker_node[*].id
+  ]
+
   provisioner "local-exec" {
-    # Pay attention of trailing spaces before and after EOT
-    command = <<-EOT
-      ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
-      -u ubuntu -i "${self.public_ip}," \
-      --private-key "${local.ssh_private_key}" \
-      -e "pub_key=${local.ssh_public_key}" \
-      -e "k8s_version=${var.cluster_def.k8s_version}" \
-      ../../provisioning/playbooks/k8s-worker-setup.yml
-    EOT
+    command = "echo [nodes] > inventory"
+  }
+
+  provisioner "local-exec" {
+    command = "echo ${join("\n",aws_instance.k8s_worker_node[*].public_ip)} >> inventory"
   }
 }
 
