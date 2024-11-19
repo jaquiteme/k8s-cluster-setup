@@ -1,3 +1,11 @@
+- name: Deleting some files before installation begin
+  hosts: localhost
+  tasks:
+    - name: Deleting /tmp/k8s-join-command.sh if it is present before continuing
+      file:
+        path: /tmp/k8s-join-command.sh
+        state: absent
+
 - name: Import common K8s node setup
   import_playbook: k8s-common-setup.yml
 
@@ -11,11 +19,6 @@
     local_user: ubuntu
     calico_release: v3.25.0
   tasks:
-    - name: Deleting join script if already present on this server
-      file:
-        path: /tmp/k8s-join-command.sh
-        state: absent
-        
     - name: Initialize cluster if not already initialized
       block:
         - name: Checking if master node already initialized
