@@ -29,14 +29,19 @@ resource "aws_instance" "k8s_master_node" {
       EOF
     }
   }
+}
 
-  # Local exec run commands immediately when the machine is provisioned
-  # Not wait for the end of boot up
+resource "terraform_data" "k8s_masters_config" {
+  triggers_replace = [
+    var.cluster_def,
+    aws_instance.k8s_master_node[*].id
+  ]
+
   provisioner "local-exec" {
     # Pay attention of trailing spaces before and after EOT
     command = <<-EOT
       ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
-      -u ubuntu -i "${self.public_ip}," \
+      -u ubuntu -i "${join(",", aws_instance.k8s_master_node[*].public_ip)}," \
       --private-key "${local.ssh_private_key}" \
       -e "pub_key=${local.ssh_public_key}" \
       -e "k8s_version=${var.cluster_def.k8s_version}" \
@@ -44,4 +49,3 @@ resource "aws_instance" "k8s_master_node" {
     EOT
   }
 }
-
