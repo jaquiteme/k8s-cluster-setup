@@ -39,7 +39,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "k8s_master_nodes" {
     ip_configuration {
       name      = "internal"
       primary   = true
-      subnet_id = module.avm-res-network-virtualnetwork.subnets[0].id
+      subnet_id = module.k8s_vnet.subnets.subnet1.id
     }
   }
 
