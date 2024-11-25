@@ -11,47 +11,43 @@ locals {
 ##################################################################
 # Azure public IP
 ##################################################################
-resource "azurerm_public_ip" "k8s_master_nodes" {
-  name                    = "k8s-master-nodes-pip"
-  location                = azurerm_resource_group.default.location
-  resource_group_name     = azurerm_resource_group.default.name
-  allocation_method       = "Dynamic"
-  idle_timeout_in_minutes = 30
+# resource "azurerm_public_ip" "k8s_master_nodes" {
+#   name                    = "k8s-master-nodes-pip"
+#   location                = data.azurerm_resource_group.default.location
+#   resource_group_name     = data.azurerm_resource_group.default.name
+#   allocation_method       = "Static"
+#   idle_timeout_in_minutes = 30
 
-  tags = merge(var.default_tags)
+#   tags = merge(var.default_tags)
+# }
+
+resource "azurerm_network_interface" "master_nodes_instances_nics" {
+  count               = var.cluster_def.master_count
+  name                = "master-nic-${count.index}"
+  location            = data.azurerm_resource_group.default.location
+  resource_group_name = data.azurerm_resource_group.default.name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = module.k8s_vnet.subnets.subnet1.resource_id
+    private_ip_address_allocation = "Dynamic"
+  }
 }
 
 ##################################################################
-# Azure scale set
+# Azure VM
 ##################################################################
-resource "azurerm_linux_virtual_machine_scale_set" "k8s_master_nodes" {
-  instances           = var.cluster_def.master_count
-  location            = azurerm_resource_group.default.location
-  sku                 = "Standard_F2"
+resource "azurerm_linux_virtual_machine" "k8s_master_nodes" {
+  count               = var.cluster_def.master_count
+  location            = data.azurerm_resource_group.default.location
+  size                = "Standard_F2"
   name                = "k8s-masters"
   admin_username      = local.default_username
   resource_group_name = "k8s-default-rg"
 
-  network_interface {
-    name    = "private"
-    primary = true
-
-    ip_configuration {
-      name      = "internal"
-      primary   = true
-      subnet_id = module.k8s_vnet.subnets.subnet1.id
-    }
-  }
-
-  network_interface {
-    name    = "public"
-    primary = false
-
-    ip_configuration {
-      name      = "external"
-      subnet_id = azurerm_public_ip.k8s_master_nodes.id
-    }
-  }
+  network_interface_ids = [
+    azurerm_network_interface.master_nodes_instances_nics[count.index].id
+  ]
 
   admin_ssh_key {
     username   = local.default_username
@@ -72,17 +68,17 @@ resource "azurerm_linux_virtual_machine_scale_set" "k8s_master_nodes" {
 
   # Running remote-exec to make sure that ssh is up and running
   # In this case before running Ansible playbook on local-exec
-  provisioner "remote-exec" {
-    inline = ["echo 'Hello from the node'"]
-    connection {
-      host        = self.network_interface[1].ip_configuration[0].public_ip_address
-      type        = "ssh"
-      user        = local.default_username
-      private_key = <<-EOF
-      ${local_file.ssh_private_key_file.content}
-      EOF
-    }
-  }
+  # provisioner "remote-exec" {
+  #   inline = ["echo 'Hello from the node'"]
+  #   connection {
+  #     host        = self.network_interface[1].ip_configuration[0].public_ip_address
+  #     type        = "ssh"
+  #     user        = local.default_username
+  #     private_key = <<-EOF
+  #     ${local_file.ssh_private_key_file.content}
+  #     EOF
+  #   }
+  # }
 
   tags = merge(var.default_tags)
 }

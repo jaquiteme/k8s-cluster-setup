@@ -1,14 +1,23 @@
-variable "region" {
+variable "location" {
   type        = string
   default     = "East US"
-  description = "Microsoft azure region"
+  description = "Microsoft azure location"
+}
+
+variable "resource_group" {
+  type = object({
+    name   = optional(string, "k8s-default-rg")
+    delete_on_destroy = optional(bool, false)
+  })
+  default     = {}
+  description = "Microsoft resource group"
 }
 
 variable "default_tags" {
   type = object({})
   default = {
     environment = "dev"
-    project = "k8s-learning"
+    project     = "k8s-learning"
   }
 }
 

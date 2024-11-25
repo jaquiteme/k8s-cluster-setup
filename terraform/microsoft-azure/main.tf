@@ -50,25 +50,25 @@ resource "local_file" "ssh_public_key_file" {
 ##################################################################
 # K8s cluster resource group
 ##################################################################
-resource "azurerm_resource_group" "default" {
-  name     = "k8s-default-rg"
-  location = var.region
+# We do not want terraform to manage existing resource group
+data "azurerm_resource_group" "default" {
+  name     = var.resource_group.name
 }
 
 ##################################################################
 # K8s NAT Gateway
 ##################################################################
-resource "azurerm_nat_gateway" "this" {
-  location            = azurerm_resource_group.default.location
-  name                = "k8s-default-instances-nat-gw"
-  resource_group_name = azurerm_resource_group.default.id
-}
+# resource "azurerm_nat_gateway" "this" {
+#   location            = data.azurerm_resource_group.default.location
+#   name                = "k8s-default-instances-nat-gw"
+#   resource_group_name = azurerm_resource_group.default.id
+# }
 
 ##################################################################
 # K8s cluster security group
 ##################################################################
 # resource "azurerm_network_security_group" "k8s_ports" {
-#   location            = azurerm_resource_group.default.location
+#   location            = data.azurerm_resource_group.default.location
 #   name                = "k8s-default-instances-sg"
 #   resource_group_name = azurerm_resource_group.default.id
 
@@ -81,12 +81,13 @@ resource "azurerm_nat_gateway" "this" {
 # K8s cluster VNET
 ##################################################################
 module "k8s_vnet" {
-  source = "Azure/avm-res-network-virtualnetwork/azurerm"
+  source  = "Azure/avm-res-network-virtualnetwork/azurerm"
+  version = "0.7.1"
 
   address_space       = try(var.cluster_def.vnet_address_spaces, [])
-  location            = var.region
+  location            = data.azurerm_resource_group.default.location
   name                = "k8s-default-vnet"
-  resource_group_name = azurerm_resource_group.default.name
+  resource_group_name = data.azurerm_resource_group.default.name
 
   enable_vm_protection = true
 
