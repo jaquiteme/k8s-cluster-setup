@@ -5,6 +5,7 @@
   vars:
     k8s_version: 1.28.0
     k8s_releases_version: "{{ k8s_version[0:4] }}"
+    k8s_package_repo_uri: "https://pkgs.k8s.io/core:/stable:"
     k8s_required_packages:
       - apt-transport-https
       - ca-certificates
@@ -16,6 +17,7 @@
       - kubeadm
       - kubelet
       - kubectl
+    docker_repo_uri: "https://download.docker.com/linux"
   tasks:
     - name: Check if package manager is busy
       shell: "lsof /var/lib/dpkg/lock-frontend"
@@ -67,7 +69,7 @@
       block:
         - name: Adding docker gpg key
           apt_key:
-            url: https://download.docker.com/linux/ubuntu/gpg
+            url: "{{ docker_repo_uri }}/ubuntu/gpg"
             state: present
 
         - name: Adding docker apt repository
@@ -75,7 +77,7 @@
             repo: >
               deb
               [arch=amd64]
-              https://download.docker.com/linux/ubuntu
+              {{ docker_repo_uri }}/ubuntu
               {{ ansible_facts['distribution_release'] }}
               stable
             state: present
@@ -122,7 +124,7 @@
           shell: >
             curl
             -fsSL
-            https://pkgs.k8s.io/core:/stable:/v{{ k8s_releases_version }}/deb/Release.key |
+            {{ k8s_package_repo_uri }}/v{{ k8s_releases_version }}/deb/Release.key |
             gpg
             --dearmor
             -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
@@ -132,7 +134,7 @@
             repo: >
               deb
               [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg]
-              https://pkgs.k8s.io/core:/stable:/v{{ k8s_releases_version }}/deb/
+              {{ k8s_package_repo_uri }}/v{{ k8s_releases_version }}/deb/
               /
             state: present
             filename: kubernetes
