@@ -119,12 +119,12 @@
     - name: Installing K8s packages
       block:
         - name: >
-            Getting K8s PGP v{{ k8s_releases_version }} repo 
+            Getting K8s PGP v{{ k8s_releases_version }} repo
             release key and converting it to GPG key
           shell: >
             curl
             -fsSL
-            {{ k8s_package_repo_uri }}/v{{ k8s_releases_version }}/deb/Release.key |
+            {{k8s_package_repo_uri}}/v{{k8s_releases_version}}/deb/Release.key |
             gpg
             --dearmor
             -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
