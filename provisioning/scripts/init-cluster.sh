@@ -14,9 +14,9 @@ sudo kubectl get nodes
 if [[ $? != 0 ]]; then
     # Setup the cluster
     sudo kubeadm init \
-    --apiserver-advertise-address "$API_SERVER_ADDR" \
-    --pod-network-cidr "$POD_NET_CIDR" \
-    --kubernetes-version "$K8S_RELEASED_VERSION"
+        --apiserver-advertise-address "$API_SERVER_ADDR" \
+        --pod-network-cidr "$POD_NET_CIDR" \
+        --kubernetes-version "$K8S_RELEASED_VERSION"
 fi
 
 if [[ $? -eq 0 ]]; then

@@ -29,11 +29,11 @@ fi
 # Install containerd.io following docker installation
 # https://forum.linuxfoundation.org/discussion/862825/kubeadm-init-error-cri-v1-runtime-api-is-not-implemented
 mkdir -p /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
-gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg |
+    gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
-tee /etc/apt/sources.list.d/docker.list > /dev/null
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" |
+    tee /etc/apt/sources.list.d/docker.list >/dev/null
 
 apt-get update && apt-get install -y containerd.io
 # Removing default containerd config if exists
@@ -51,20 +51,19 @@ apt-get update && apt-get install -y ca-certificates apt-transport-https curl gp
 
 # Download Google cloud public signing key
 mkdir -p /etc/apt/keyrings
-curl -fsSL "https://pkgs.k8s.io/core:/stable:/v${K8S_VERSION}/deb/Release.key" | \
+curl -fsSL "https://pkgs.k8s.io/core:/stable:/v${K8S_VERSION}/deb/Release.key" |
     gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
-
 # Add K8S apt
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v${K8S_VERSION}/deb/ /" | \
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v${K8S_VERSION}/deb/ /" |
     tee /etc/apt/sources.list.d/kubernetes.list
 
 # Install K8S packages
 apt-get update && apt-get install -y \
-kubelet="$K8S_VERSION" \
-kubeadm="$K8S_VERSION" \
-kubectl="$K8S_VERSION" \
---allow-change-held-packages
+    kubelet="$K8S_VERSION" \
+    kubeadm="$K8S_VERSION" \
+    kubectl="$K8S_VERSION" \
+    --allow-change-held-packages
 
 # Freeze K8s package versions
 if [[ $? -eq 0 ]]; then

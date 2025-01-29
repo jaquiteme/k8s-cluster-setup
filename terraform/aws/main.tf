@@ -1,19 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 4.16"
-    }
-  }
-  required_version = ">= 1.2.0"
-}
-
-# AWS provider config
-provider "aws" {
-  region = var.region
-  shared_credentials_files = ["./credentials"]
-}
-
 # Create cluster nodes ssh keys
 resource "tls_private_key" "cluster_nodes_key" {
   algorithm = "RSA"
