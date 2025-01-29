@@ -121,7 +121,7 @@ resource "terraform_data" "k8s_nodes_config" {
     # Pay attention of trailing spaces before and after EOT
     command = <<-EOT
       ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
-      -u ubuntu -i "${join(",", azurerm_linux_virtual_machine.k8s_worker_nodes[*].public_ip_address)}," \
+      -u "${local.default_username}" -i "${join(",", azurerm_linux_virtual_machine.k8s_worker_nodes[*].public_ip_address)}," \
       --private-key "${local.worker_ssh_private_key}" \
       -e "pub_key=${local.worker_ssh_public_key}" \
       -e "k8s_version=${var.cluster_def.k8s_version}" \

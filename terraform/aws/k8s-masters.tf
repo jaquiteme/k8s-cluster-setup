@@ -42,7 +42,7 @@ resource "terraform_data" "k8s_masters_config" {
     # Pay attention of trailing spaces before and after EOT
     command = <<-EOT
       ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
-      -u "${local.default_username}" -i "${join(",", aws_instance.k8s_master_node[*].public_ip)}," \
+      -u ubuntu -i "${join(",", aws_instance.k8s_master_node[*].public_ip)}," \
       --private-key "${local.ssh_private_key}" \
       -e "pub_key=${local.ssh_public_key}" \
       -e "k8s_version=${var.cluster_def.k8s_version}" \
