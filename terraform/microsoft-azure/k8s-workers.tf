@@ -64,7 +64,7 @@ resource "azurerm_network_interface" "worker_nodes_instances_nics" {
 resource "azurerm_linux_virtual_machine" "k8s_worker_nodes" {
   count                           = var.cluster_def.worker_count
   location                        = data.azurerm_resource_group.default.location
-  size                            = "Standard_B2s_v2"
+  size                            = var.cluster_def.worker_vm_size
   name                            = "k8s-worker-${count.index}"
   admin_username                  = local.default_username
   resource_group_name             = data.azurerm_resource_group.default.name

@@ -1,4 +1,4 @@
 cluster_def = {
   "k8s_version" = "1.30.0-00"
 }
-resource_group = "YOUR_AZURE_RESOURCE_GROUP_NAME"
+azure_resource_group = "YOUR_AZURE_RESOURCE_GROUP_NAME"
