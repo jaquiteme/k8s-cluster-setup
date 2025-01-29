@@ -109,7 +109,7 @@ resource "azurerm_linux_virtual_machine" "k8s_master_nodes" {
 resource "terraform_data" "k8s_masters_config" {
   triggers_replace = [
     var.cluster_def,
-    aws_instance.k8s_master_node[*].id
+    azurerm_linux_virtual_machine.k8s_master_nodes[*].id
   ]
 
   provisioner "local-exec" {

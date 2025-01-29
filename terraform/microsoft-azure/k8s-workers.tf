@@ -112,7 +112,7 @@ resource "azurerm_linux_virtual_machine" "k8s_worker_nodes" {
 resource "terraform_data" "k8s_nodes_config" {
   triggers_replace = [
     var.cluster_def,
-    aws_instance.k8s_worker_node[*].id
+    azurerm_linux_virtual_machine.k8s_worker_nodes[*].id
   ]
 
   # Local exec run commands immediately when the machine is provisioned
