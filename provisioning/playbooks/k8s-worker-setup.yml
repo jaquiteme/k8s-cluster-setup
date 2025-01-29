@@ -1,3 +1,4 @@
+---
 - name: Import common K8s node setup
   import_playbook: k8s-common-setup.yml
 

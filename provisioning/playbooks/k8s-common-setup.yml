@@ -29,7 +29,7 @@
       apt:
         name: "{{ k8s_required_packages }}"
         state: present
-        update_cache: yes
+        update_cache: true
       register: result
       until: result is success
       retries: 5
@@ -61,7 +61,7 @@
         path: /etc/apt/keyrings
         state: directory
         mode: 0755
-        recurse: yes
+        recurse: true
 
     - name: Installing containerd.io
       block:
@@ -80,7 +80,7 @@
           apt:
             name: containerd.io
             state: present
-            update_cache: yes
+            update_cache: true
 
         # https://forum.linuxfoundation.org/discussion/862825/kubeadm-init-error-cri-v1-runtime-api-is-not-implemented
         - name: Removing default containerd.io config folder
@@ -92,7 +92,7 @@
           service:
             name: containerd
             state: started
-            enabled: yes
+            enabled: true
 
     - name: Disabling swapp before process K8s installation
       block:
@@ -125,10 +125,10 @@
           apt:
             name: "{{ k8s_packages }}"
             state: present
-            update_cache: yes
+            update_cache: true
           notify: Restart containerd
 
-        - name: Set containerd runtime 
+        - name: Set containerd runtime
           command: crictl config --set runtime-endpoint=unix:///run/containerd/containerd.sock --set image-endpoint=unix:///run/containerd/containerd.sock
           notify: Restart containerd
 
@@ -136,7 +136,7 @@
           service:
             name: kubelet
             state: started
-            enabled: yes
+            enabled: true
 
   # HANDLERS
   # Restart Kubelet
@@ -145,10 +145,10 @@
       service:
         name: kubelet
         state: restarted
-        enabled: yes
+        enabled: true
     # Restart containerd
     - name: Restart containerd
       service:
         name: containerd
         state: restarted
-        enabled: yes
+        enabled: true

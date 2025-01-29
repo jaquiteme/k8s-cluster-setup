@@ -1,3 +1,4 @@
+---
 - name: Deleting some files before installation begin
   hosts: localhost
   tasks:
@@ -52,7 +53,7 @@
             dest: /home/{{local_user}}/.kube/config
             owner: "{{ local_user }}"
             group: "{{ local_user }}"
-            remote_src: yes
+            remote_src: true
 
     - name: Installing Networking Plugin Calico
       become: false
@@ -78,4 +79,4 @@
       fetch:
         src: /tmp/k8s-join-command.sh
         dest: /tmp/k8s-join-command.sh
-        flat: yes
+        flat: true

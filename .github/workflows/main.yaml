@@ -23,5 +23,5 @@ jobs:
         run: terraform fmt -recursive -check -no-color ./terraform
 
       # Yamllint are installed by default on ubuntu runners
-      - name: Setup yaml lint
+      - name: Runnning yaml lint
         run: yamllint provisioning/playbooks
