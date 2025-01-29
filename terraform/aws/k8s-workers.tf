@@ -14,7 +14,7 @@ resource "aws_instance" "k8s_worker_node" {
   # Running remote-exec to make sure that ssh is up and running
   # In this case before running Ansible playbook on local-exec
   provisioner "remote-exec" {
-    inline = ["echo 'Hello from the node'"]
+    inline = ["echo 'testing remote-exec connection successful'"]
     connection {
       host        = self.public_ip
       type        = "ssh"
@@ -26,6 +26,7 @@ resource "aws_instance" "k8s_worker_node" {
   }
 }
 
+# Running node configuration separately
 resource "terraform_data" "k8s_nodes_config" {
   triggers_replace = [
     var.cluster_def,

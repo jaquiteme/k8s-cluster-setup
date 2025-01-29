@@ -91,7 +91,7 @@ resource "azurerm_linux_virtual_machine" "k8s_master_nodes" {
   # Running remote-exec to make sure that ssh is up and running
   # In this case before running Ansible playbook on local-exec
   provisioner "remote-exec" {
-    inline = ["echo 'Hello from the node'"]
+    inline = ["echo 'testing remote-exec connection successful'"]
     connection {
       host        = self.public_ip_address
       type        = "ssh"
@@ -103,4 +103,24 @@ resource "azurerm_linux_virtual_machine" "k8s_master_nodes" {
   }
 
   tags = merge(var.default_tags)
+}
+
+# Running node configuration separately
+resource "terraform_data" "k8s_masters_config" {
+  triggers_replace = [
+    var.cluster_def,
+    aws_instance.k8s_master_node[*].id
+  ]
+
+  provisioner "local-exec" {
+    # Pay attention of trailing spaces before and after EOT
+    command = <<-EOT
+      ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
+      -u ubuntu -i "${join(",", azurerm_linux_virtual_machine.k8s_master_nodes[*].public_ip_address)}," \
+      --private-key "${local.master_ssh_private_key}" \
+      -e "pub_key=${local.master_ssh_public_key}" \
+      -e "k8s_version=${var.cluster_def.k8s_version}" \
+      ../../provisioning/playbooks/k8s-master-setup.yml
+    EOT
+  }
 }
