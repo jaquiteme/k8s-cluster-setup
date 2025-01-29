@@ -2,7 +2,9 @@
 - name: Deleting some files before installation begin
   hosts: localhost
   tasks:
-    - name: Deleting /tmp/k8s-join-command.sh if it is present before continuing
+    - name: >-
+        Deleting /tmp/k8s-join-command.sh
+        if it is present before continuing
       file:
         path: /tmp/k8s-join-command.sh
         state: absent
@@ -18,6 +20,7 @@
     k8s_version: 1.28.0
     pod_network_cidr: 192.168.0.0/16
     local_user: ubuntu
+    calico_git_repo: https://raw.githubusercontent.com/projectcalico/calico
     calico_release: v3.25.0
   tasks:
     - name: Initialize cluster if not already initialized
@@ -26,7 +29,8 @@
           command: kubectl version
           register: k8s_install_check
       rescue:
-        # Cluster initialization can take up to 5 minutes, regarding your machine capacities
+        # Cluster initialization can take up to 5 minutes, 
+        # regarding your machine capacities
         # so, be patient <(^_^)>
         - name: Initialize k8s cluster on master node
           command: >
@@ -57,7 +61,11 @@
 
     - name: Installing Networking Plugin Calico
       become: false
-      command: "kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/{{ calico_release }}/manifests/calico.yaml"
+      command: >
+        kubectl 
+        create 
+        -f 
+        {{calico_git_repo}}/{{ calico_release }}/manifests/calico.yaml
       register: result
       ignore_errors: true
       until: result.rc == 0

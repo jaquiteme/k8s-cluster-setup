@@ -5,7 +5,9 @@
 - name: Waiting for some requirements on localhost
   hosts: localhost
   tasks:
-    - name: Wait until the file /tmp/k8s-join-command.sh is present before continuing
+    - name: >
+        Wait until the file /tmp/k8s-join-command.sh 
+        is present before continuing
       wait_for:
         path: /tmp/k8s-join-command.sh
 

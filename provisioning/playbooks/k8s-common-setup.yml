@@ -72,7 +72,12 @@
 
         - name: Adding docker apt repository
           apt_repository:
-            repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_facts['distribution_release'] }} stable
+            repo: >
+              deb
+              [arch=amd64]
+              https://download.docker.com/linux/ubuntu
+              {{ ansible_facts['distribution_release'] }}
+              stable
             state: present
             filename: docker
 
@@ -111,12 +116,24 @@
 
     - name: Installing K8s packages
       block:
-        - name: Getting K8s PGP v{{ k8s_releases_version }} repo release key and converting it to GPG key
-          shell: "curl -fsSL https://pkgs.k8s.io/core:/stable:/v{{ k8s_releases_version }}/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg"
+        - name: >
+            Getting K8s PGP v{{ k8s_releases_version }} repo 
+            release key and converting it to GPG key
+          shell: >
+            curl
+            -fsSL
+            https://pkgs.k8s.io/core:/stable:/v{{ k8s_releases_version }}/deb/Release.key |
+            gpg
+            --dearmor
+            -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
         - name: Adding kubernetes v{{ k8s_releases_version }} apt repository
           apt_repository:
-            repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v{{ k8s_releases_version }}/deb/ /"
+            repo: >
+              deb
+              [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg]
+              https://pkgs.k8s.io/core:/stable:/v{{ k8s_releases_version }}/deb/
+              /
             state: present
             filename: kubernetes
             update_cache: true
@@ -129,7 +146,11 @@
           notify: Restart containerd
 
         - name: Set containerd runtime
-          command: crictl config --set runtime-endpoint=unix:///run/containerd/containerd.sock --set image-endpoint=unix:///run/containerd/containerd.sock
+          command: >
+            crictl
+            config
+            --set runtime-endpoint=unix:///run/containerd/containerd.sock
+            --set image-endpoint=unix:///run/containerd/containerd.sock
           notify: Restart containerd
 
         - name: Starting kubelet service
