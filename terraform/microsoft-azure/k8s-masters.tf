@@ -44,7 +44,7 @@ resource "azurerm_public_ip" "k8s_master_nodes" {
 resource "azurerm_network_interface" "master_nodes_instances_nics" {
   count               = var.cluster_def.master_count
   name                = "master-nic-${count.index}"
-  location            = var.location
+  location            = data.azurerm_resource_group.default.location
   resource_group_name = data.azurerm_resource_group.default.name
 
   ip_configuration {
@@ -60,7 +60,7 @@ resource "azurerm_network_interface" "master_nodes_instances_nics" {
 ##################################################################
 resource "azurerm_linux_virtual_machine" "k8s_master_nodes" {
   count                           = var.cluster_def.master_count
-  location                        = var.location
+  location                        = data.azurerm_resource_group.default.location
   size                            = "Standard_D2s_v3"
   name                            = "k8s-master-${count.index}"
   admin_username                  = local.default_username

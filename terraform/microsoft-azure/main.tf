@@ -1,7 +1,7 @@
 
 # Local variables
 locals {
-  # Ssecurity group ingress rules
+  # Security group ingress rules
   security_rules = [
     {
       name                         = "AllowInboundSSH",
@@ -51,7 +51,7 @@ locals {
 ##################################################################
 # We do not want terraform to manage existing resource group
 data "azurerm_resource_group" "default" {
-  name = var.resource_group.name
+  name = var.azure_resource_group
 }
 
 ##################################################################
@@ -67,7 +67,7 @@ data "azurerm_resource_group" "default" {
 # K8s Network Security Group
 ##################################################################
 resource "azurerm_network_security_group" "k8s_subnet_nsg" {
-  location            = var.location
+  location            = data.azurerm_resource_group.default.location
   name                = "k8s-default-nsg"
   resource_group_name = data.azurerm_resource_group.default.name
 
@@ -100,7 +100,7 @@ module "k8s_vnet" {
   version = "0.7.1"
 
   address_space       = try(var.cluster_def.vnet_address_spaces, [])
-  location            = var.location
+  location            = data.azurerm_resource_group.default.location
   name                = "k8s-default-vnet"
   resource_group_name = data.azurerm_resource_group.default.name
 

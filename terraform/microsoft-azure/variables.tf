@@ -1,7 +1,6 @@
-variable "location" {
+variable "azure_resource_group" {
   type        = string
-  default     = "East US"
-  description = "Microsoft azure location"
+  description = "Azure resource group name"
 }
 
 variable "resource_group" {

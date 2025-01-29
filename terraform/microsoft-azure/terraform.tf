@@ -8,9 +8,3 @@ terraform {
 
   required_version = ">= 1.9.2"
 }
-
-# Azure provider config
-provider "azurerm" {
-  resource_provider_registrations = "none"
-  features {}
-}
