@@ -118,6 +118,7 @@ resource "terraform_data" "k8s_masters_config" {
       ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
       -u "${local.default_username}" -i "${join(",", azurerm_linux_virtual_machine.k8s_master_nodes[*].public_ip_address)}," \
       --private-key "${local.master_ssh_private_key}" \
+      -e "local_user=${local.default_username}" \
       -e "pub_key=${local.master_ssh_public_key}" \
       -e "k8s_version=${var.cluster_def.k8s_version}" \
       ../../provisioning/playbooks/k8s-master-setup.yml
