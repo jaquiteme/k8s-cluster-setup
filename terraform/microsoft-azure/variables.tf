@@ -24,9 +24,9 @@ variable "cluster_def" {
   type = object({
     k8s_version          = optional(string, "1.28.0-00")
     master_count         = optional(number, 1)
-    master_vm_size        = optional(string, "Standard_D2s_v3")
+    master_vm_size       = optional(string, "Standard_D2s_v3")
     worker_count         = optional(number, 2)
-    worker_vm_size        = optional(string, "Standard_D2s_v3")
+    worker_vm_size       = optional(string, "Standard_D2s_v3")
     nodes_ssh_key_prefix = optional(string, "k8s-cluster-key")
     vnet_address_spaces  = optional(list(string), ["172.16.0.0/16"])
     private_subnets      = optional(list(string), ["172.16.1.0/24"])

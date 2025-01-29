@@ -12,14 +12,14 @@ resource "aws_key_pair" "generated_key" {
 
 # Copy private key into a file and store it in your local folder
 resource "local_file" "ssh_private_key_file" {
-  content  = "${tls_private_key.cluster_nodes_key.private_key_pem}"
-  filename = "${path.module}/${var.cluster_def.nodes_ssh_key_name}.pem"
+  content         = tls_private_key.cluster_nodes_key.private_key_pem
+  filename        = "${path.module}/${var.cluster_def.nodes_ssh_key_name}.pem"
   file_permission = "0600"
 }
 
 # Copy public key into a file
 resource "local_file" "ssh_public_key_file" {
-  content  = "${tls_private_key.cluster_nodes_key.public_key_openssh}"
+  content  = tls_private_key.cluster_nodes_key.public_key_openssh
   filename = "${path.module}/${var.cluster_def.nodes_ssh_key_name}.pub"
 }
 
@@ -77,9 +77,9 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "3.19.0"
 
-  name = "k8s-vpc"
-  cidr = var.cluster_def.vpc_cidr
-  azs = data.aws_availability_zones.available.names
+  name                 = "k8s-vpc"
+  cidr                 = var.cluster_def.vpc_cidr
+  azs                  = data.aws_availability_zones.available.names
   enable_dns_hostnames = true
 }
 
@@ -87,28 +87,28 @@ module "vpc" {
 locals {
   # AWS security group ingress rules 
   ingress_rules = [
-      { 
-        from = 22, 
-        to = 22, 
-        proto = "tcp", 
-        cidr = ["0.0.0.0/0"], 
-        description = "Incoming ssh rule"
-      },
-      { 
-        from = 0, 
-        to = 6443, 
-        proto = "tcp", 
-        cidr = ["0.0.0.0/0"], 
-        description = "Incoming custom K8s https Control node API"
-      },
-      { 
-        from = 0, 
-        to = 0, 
-        proto = "-1", 
-        cidr = [var.cluster_def.private_subnet_cidr], 
-        description = "All K8s traffic inside the subnet"
-      }
-    ]
+    {
+      from        = 22,
+      to          = 22,
+      proto       = "tcp",
+      cidr        = ["0.0.0.0/0"],
+      description = "Incoming ssh rule"
+    },
+    {
+      from        = 0,
+      to          = 6443,
+      proto       = "tcp",
+      cidr        = ["0.0.0.0/0"],
+      description = "Incoming custom K8s https Control node API"
+    },
+    {
+      from        = 0,
+      to          = 0,
+      proto       = "-1",
+      cidr        = [var.cluster_def.private_subnet_cidr],
+      description = "All K8s traffic inside the subnet"
+    }
+  ]
 }
 
 # Create aws security group
@@ -133,7 +133,7 @@ resource "aws_security_group" "k8s_cluster_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = {
-    Name        = "K8s network acl"
+    Name = "K8s network acl"
   }
 }
 
